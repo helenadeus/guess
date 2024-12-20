@@ -1,39 +1,5 @@
 import React, { useState } from 'react';
 
-const generateRandomSequences = () => {
-  const sequences = [];
-
-  for (let i = 0; i < 10; i++) {
-    const type = Math.floor(Math.random() * 4); // Choose a type of sequence
-    const start = Math.floor(Math.random() * 10) + 1; // Random starting number
-    let sequence = [];
-
-    switch (type) {
-      case 0: // Arithmetic progression
-        const diff = Math.floor(Math.random() * 5) + 1;
-        sequence = Array.from({ length: 5 }, (_, idx) => start + idx * diff);
-        break;
-      case 1: // Geometric progression
-        const ratio = Math.floor(Math.random() * 3) + 2;
-        sequence = Array.from({ length: 5 }, (_, idx) => start * Math.pow(ratio, idx));
-        break;
-      case 2: // Squares
-        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(start + idx, 2));
-        break;
-      case 3: // Factorials
-        const factorial = (n) => (n === 0 || n === 1 ? 1 : n * factorial(n - 1));
-        sequence = Array.from({ length: 5 }, (_, idx) => factorial(idx + 1));
-        break;
-      default:
-        break;
-    }
-
-    sequences.push(sequence);
-  }
-
-  return sequences;
-};
-
 const calculateNextNumber = (sequence, type) => {
   const n = sequence.length;
   switch (type) {
@@ -53,31 +19,70 @@ const calculateNextNumber = (sequence, type) => {
   }
 };
 
+const generateRandomSequences = () => {
+  const sequences = [];
+
+  for (let i = 0; i < 10; i++) {
+    const type = Math.floor(Math.random() * 4);
+    const start = Math.floor(Math.random() * 10) + 1;
+    let sequence = [];
+    let description = '';
+
+    switch (type) {
+      case 0:
+        const diff = Math.floor(Math.random() * 5) + 1;
+        sequence = Array.from({ length: 5 }, (_, idx) => start + idx * diff);
+        description = `Arithmetic sequence with difference of ${diff}`;
+        break;
+      case 1:
+        const ratio = Math.floor(Math.random() * 3) + 2;
+        sequence = Array.from({ length: 5 }, (_, idx) => start * Math.pow(ratio, idx));
+        description = `Geometric sequence with ratio of ${ratio}`;
+        break;
+      case 2:
+        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(start + idx, 2));
+        description = 'Square numbers';
+        break;
+      case 3:
+        const factorial = (n) => (n === 0 || n === 1 ? 1 : n * factorial(n - 1));
+        sequence = Array.from({ length: 5 }, (_, idx) => factorial(idx + 1));
+        description = 'Factorial sequence';
+        break;
+    }
+
+    sequences.push({ sequence, type, description });
+  }
+
+  return sequences;
+};
+
 const SequenceGuessingGame = () => {
   const [sequences] = useState(generateRandomSequences());
   const [guesses, setGuesses] = useState(Array(10).fill(''));
-  const [sequenceTypes] = useState(Array(10).fill().map(() => Math.floor(Math.random() * 4)));
   const [results, setResults] = useState(Array(10).fill(null));
+
   const handleGuessChange = (index, value) => {
     const newGuesses = [...guesses];
     newGuesses[index] = value;
     setGuesses(newGuesses);
   };
+
   const checkGuess = (index) => {
-    const expectedNext = calculateNextNumber(sequences[index], sequenceTypes[index]);
+    const expectedNext = calculateNextNumber(sequences[index].sequence, sequences[index].type);
     const userGuess = parseFloat(guesses[index]);
     const newResults = [...results];
-    newResults[index] = Math.abs(userGuess - expectedNext) < 0.0001; // Using small epsilon for float comparison
+    newResults[index] = Math.abs(userGuess - expectedNext) < 0.0001;
     setResults(newResults);
   };
+
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', backgroundColor: '#000', color: '#fff', minHeight: '100vh' }}>
       <h1 style={{ textAlign: 'center', color: '#00ff00' }}>Sequence Guessing Game</h1>
       <p style={{ textAlign: 'center' }}>Below are 10 sequences. Can you guess the next number?</p>
       <ul style={{ listStyleType: 'none', padding: 0 }}>
-        {sequences.map((sequence, index) => (
+        {sequences.map((seqData, index) => (
           <li key={index} style={{ marginBottom: '15px', padding: '10px', border: '1px solid #00ff00', borderRadius: '5px' }}>
-            {sequence.join(', ')}
+            {seqData.sequence.join(', ')}
             <br />
             <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
               <input
@@ -106,7 +111,14 @@ const SequenceGuessingGame = () => {
                 marginTop: '5px', 
                 color: results[index] ? '#00ff00' : '#ff0000' 
               }}>
-                {results[index] ? 'Correct!' : 'Try again!'}
+                {results[index] ? 'Correct!' : (
+                  <>
+                    Try again! <br/>
+                    <span style={{ fontSize: '0.9em', opacity: '0.8' }}>
+                      Hint: This is a {seqData.description}
+                    </span>
+                  </>
+                )}
               </div>
             )}
           </li>
