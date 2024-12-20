@@ -74,3 +74,4 @@ Helena F. Deus
 
 - Inspired by mathematical sequence puzzles
 - Built as a learning project for React
+- Thank you team Cursor for the help! ![Cursor](https://www.cursor.com/)
