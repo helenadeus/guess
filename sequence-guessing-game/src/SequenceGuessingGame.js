@@ -14,6 +14,12 @@ const calculateNextNumber = (sequence, type) => {
       return Math.pow(root + 1, 2);
     case 3: // Factorial
       return sequence[n - 1] * (n + 1);
+    case 4: // Multiply and add (e.g., n * 2 + 1)
+      const multDiff = sequence[1] - (sequence[0] * 2);
+      return sequence[n - 1] * 2 + multDiff;
+    case 5: // Square and add (e.g., n² + 2)
+      const addDiff = sequence[1] - Math.pow(2, 2);
+      return Math.pow(n + 1, 2) + addDiff;
     default:
       return 0;
   }
@@ -23,7 +29,7 @@ const generateRandomSequences = () => {
   const sequences = [];
 
   for (let i = 0; i < 10; i++) {
-    const type = Math.floor(Math.random() * 4);
+    const type = Math.floor(Math.random() * 6); // Updated to include new types
     const start = Math.floor(Math.random() * 10) + 1;
     let sequence = [];
     let description = '';
@@ -48,6 +54,18 @@ const generateRandomSequences = () => {
         sequence = Array.from({ length: 5 }, (_, idx) => factorial(idx + 1));
         description = 'Factorial sequence';
         break;
+      case 4:
+        const addNum = Math.floor(Math.random() * 5) + 1;
+        sequence = Array.from({ length: 5 }, (_, idx) => (idx + 1) * 3 + addNum);  // Changed multiplier from 2 to 3
+        
+        description = `Multiply by 3 and add ${addNum}`;  
+        
+        break;
+      case 5:
+        const squareAdd = Math.floor(Math.random() * 5) + 1;
+        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 2) + squareAdd);
+        description = `Square number plus ${squareAdd}`;
+        break;
     }
 
     sequences.push({ sequence, type, description });
@@ -70,6 +88,12 @@ const SequenceGuessingGame = () => {
   const checkGuess = (index) => {
     const expectedNext = calculateNextNumber(sequences[index].sequence, sequences[index].type);
     const userGuess = parseFloat(guesses[index]);
+    console.log({
+      sequence: sequences[index].sequence,
+      type: sequences[index].type,
+      expectedNext,
+      userGuess
+    });
     const newResults = [...results];
     newResults[index] = Math.abs(userGuess - expectedNext) < 0.0001;
     setResults(newResults);
