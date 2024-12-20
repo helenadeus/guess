@@ -64,7 +64,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## Screenshots
 
-![Game Screenshot](./public/screenshots/guessing.png)
+![Game Screenshot](./screenshots/guessing.png)
 
 ## Author
 
