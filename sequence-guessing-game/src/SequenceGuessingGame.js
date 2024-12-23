@@ -1,74 +1,92 @@
 import React, { useState } from 'react';
 
-const calculateNextNumber = (sequence, type) => {
-  const n = sequence.length;
-  switch (type) {
-    case 0: // Arithmetic
-      const diff = sequence[1] - sequence[0];
-      return sequence[n - 1] + diff;
-    case 1: // Geometric
-      const ratio = sequence[1] / sequence[0];
-      return sequence[n - 1] * ratio;
-    case 2: // Squares
-      const root = Math.sqrt(sequence[n - 1]);
-      return Math.pow(root + 1, 2);
-    case 3: // Factorial
-      return sequence[n - 1] * (n + 1);
-    case 4: // Multiply and add (e.g., n * 2 + 1)
-      const multDiff = sequence[1] - (sequence[0] * 2);
-      return sequence[n - 1] * 2 + multDiff;
-    case 5: // Square and add (e.g., n² + 2)
-      const addDiff = sequence[1] - Math.pow(2, 2);
-      return Math.pow(n + 1, 2) + addDiff;
-    default:
-      return 0;
-  }
-};
 
 const generateRandomSequences = () => {
   const sequences = [];
+  const usedSequences = new Set();
+  const sequenceToString = (seq) => seq.join(',');
 
-  for (let i = 0; i < 10; i++) {
-    const type = Math.floor(Math.random() * 6); // Updated to include new types
-    const start = Math.floor(Math.random() * 10) + 1;
+  while (sequences.length < 10) {
+    const type = Math.floor(Math.random() * 6);
+    const start = Math.floor(Math.random() * 100) + 1;
     let sequence = [];
     let description = '';
+    let formula = '';
+    let nextNumber = 0; 
 
     switch (type) {
       case 0:
-        const diff = Math.floor(Math.random() * 5) + 1;
-        sequence = Array.from({ length: 5 }, (_, idx) => start + idx * diff);
-        description = `Arithmetic sequence with difference of ${diff}`;
+        const divisor = Math.floor(Math.random() * 3) + 2;
+        const adder = Math.floor(Math.random() * 5) + 1;  
+        sequence = Array.from({ length: 5 }, (_, idx) => {
+          const n = start + idx * divisor;
+          const divided = n / divisor;
+          const result = divided + adder;
+          // If result is an integer, show it as is
+          if (Number.isInteger(result)) {
+            return result;
+          }
+          // Otherwise, show as a simplified fraction + adder
+          return Math.floor(result) === result ? result : `${n}/${divisor} + ${adder}`;
+        });
+        nextNumber = (start + 5 * divisor) / divisor + adder;
+        description = `Each number divided by ${divisor} plus ${adder}`;
+        formula = `x[n] = n ÷ ${divisor} + ${adder}`;
         break;
       case 1:
         const ratio = Math.floor(Math.random() * 3) + 2;
         sequence = Array.from({ length: 5 }, (_, idx) => start * Math.pow(ratio, idx));
+        nextNumber = sequence[sequence.length - 1] * ratio;  // Calculate next
         description = `Geometric sequence with ratio of ${ratio}`;
+        formula = `x[n] = x[n-1] × ${ratio}`;
         break;
       case 2:
-        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(start + idx, 2));
-        description = 'Square numbers';
+        const squareConst = Math.floor(Math.random() * 5) + 1;
+        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 2) + squareConst);
+        nextNumber = Math.pow(6, 2) + squareConst;  // Calculate next
+        description = `Square numbers plus ${squareConst}`;
+        formula = `x[n] = n² + ${squareConst}`;
         break;
       case 3:
         const factorial = (n) => (n === 0 || n === 1 ? 1 : n * factorial(n - 1));
         sequence = Array.from({ length: 5 }, (_, idx) => factorial(idx + 1));
+        nextNumber = factorial(6);  // Calculate next
         description = 'Factorial sequence';
+        formula = `x[n] = n!`;
         break;
       case 4:
         const addNum = Math.floor(Math.random() * 5) + 1;
-        sequence = Array.from({ length: 5 }, (_, idx) => (idx + 1) * 3 + addNum);  // Changed multiplier from 2 to 3
-        
-        description = `Multiply by 3 and add ${addNum}`;  
-        
+        sequence = Array.from({ length: 5 }, (_, idx) => (idx + 1) * 3 + addNum);
+        nextNumber = 6 * 3 + addNum;  // Calculate next
+        description = `Multiply by 3 and add ${addNum}`;
+        formula = `x[n] = 3n + ${addNum}`;
         break;
       case 5:
         const squareAdd = Math.floor(Math.random() * 5) + 1;
         sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 2) + squareAdd);
+        nextNumber = Math.pow(6, 2) + squareAdd;  // Calculate next
         description = `Square number plus ${squareAdd}`;
+        formula = `x[n] = n² + ${squareAdd}`;
+        break;
+      default:
+        sequence = Array.from({ length: 5 }, (_, idx) => idx + 1);
+        nextNumber = 6;
+        description = 'Simple counting sequence';
+        formula = 'x[n] = n';
         break;
     }
 
-    sequences.push({ sequence, type, description });
+    const sequenceString = sequenceToString(sequence);
+    if (!usedSequences.has(sequenceString)) {
+      usedSequences.add(sequenceString);
+      sequences.push({ 
+        sequence, 
+        type, 
+        description, 
+        formula,
+        nextNumber 
+      });
+    }
   }
 
   return sequences;
@@ -78,6 +96,7 @@ const SequenceGuessingGame = () => {
   const [sequences] = useState(generateRandomSequences());
   const [guesses, setGuesses] = useState(Array(10).fill(''));
   const [results, setResults] = useState(Array(10).fill(null));
+  const [attempts, setAttempts] = useState(Array(10).fill(0)); 
 
   const handleGuessChange = (index, value) => {
     const newGuesses = [...guesses];
@@ -85,20 +104,54 @@ const SequenceGuessingGame = () => {
     setGuesses(newGuesses);
   };
 
+  const evaluateGuess = (input) => {
+    // Remove all whitespace
+    const sanitizedInput = input.replace(/\s+/g, '');
+    
+    // Check if input contains only valid mathematical expressions
+    const validPattern = /^[0-9+\-*/().]+$/;
+    
+    if (!validPattern.test(sanitizedInput)) {
+      return parseFloat(input); // Return original input if it's not a valid expression
+    }
+  
+    try {
+      // Evaluate the expression
+      const result = eval(sanitizedInput);
+      return typeof result === 'number' && !isNaN(result) ? result : parseFloat(input);
+    } catch (error) {
+      return parseFloat(input); // Return original input if evaluation fails
+    }
+  };
+  
   const checkGuess = (index) => {
-    const expectedNext = calculateNextNumber(sequences[index].sequence, sequences[index].type);
-    const userGuess = parseFloat(guesses[index]);
-    console.log({
+    const userInput = guesses[index];
+    const userGuess = evaluateGuess(userInput);
+    const expectedNext = sequences[index].nextNumber;  
+  
+    // Add debugging here
+    console.log('Checking sequence:', {
       sequence: sequences[index].sequence,
       type: sequences[index].type,
+      description: sequences[index].description,
+      formula: sequences[index].formula,
       expectedNext,
-      userGuess
+      userGuess,
+      attempts: attempts[index] + 1
     });
+  
     const newResults = [...results];
-    newResults[index] = Math.abs(userGuess - expectedNext) < 0.0001;
+    const newAttempts = [...attempts];
+  
+    newAttempts[index]++;
+    setAttempts(newAttempts);
+  
+    newResults[index] = Math.abs(userGuess - expectedNext) < 0.1;
     setResults(newResults);
   };
+  
 
+  
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', backgroundColor: '#000', color: '#fff', minHeight: '100vh' }}>
       <h1 style={{ textAlign: 'center', color: '#00ff00' }}>Sequence Guessing Game</h1>
@@ -135,11 +188,24 @@ const SequenceGuessingGame = () => {
                 marginTop: '5px', 
                 color: results[index] ? '#00ff00' : '#ff0000' 
               }}>
-                {results[index] ? 'Correct!' : (
+                {results[index] ?  (
+                    <>
+                      Correct! <br/>
+                      <span style={{ fontSize: '0.9em', opacity: '0.8' }}>
+                        Formula: {seqData.formula}
+                      </span>
+                    </>
+                  ) : (
                   <>
                     Try again! <br/>
                     <span style={{ fontSize: '0.9em', opacity: '0.8' }}>
-                      Hint: This is a {seqData.description}
+                    Hint: This is a {seqData.description}
+                      {attempts[index] >= 3 && (
+                        <>
+                          <br/>
+                          Formula: {seqData.formula}
+                        </>
+                      )}
                     </span>
                   </>
                 )}
