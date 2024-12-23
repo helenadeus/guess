@@ -18,20 +18,19 @@ const generateRandomSequences = () => {
       case 0:
         const divisor = Math.floor(Math.random() * 3) + 2;
         const adder = Math.floor(Math.random() * 5) + 1;  
+        const isAddition = Math.random() < 0.5; // 50% chance for addition vs subtraction
         sequence = Array.from({ length: 5 }, (_, idx) => {
           const n = start + idx * divisor;
           const divided = n / divisor;
-          const result = divided + adder;
-          // If result is an integer, show it as is
+          const result = isAddition ? divided + adder : divided - adder;
           if (Number.isInteger(result)) {
             return result;
           }
-          // Otherwise, show as a simplified fraction + adder
-          return Math.floor(result) === result ? result : `${n}/${divisor} + ${adder}`;
+          return Math.floor(result) === result ? result : `${n}/${divisor} ${isAddition ? '+' : '-'} ${adder}`;
         });
-        nextNumber = (start + 5 * divisor) / divisor + adder;
-        description = `Each number divided by ${divisor} plus ${adder}`;
-        formula = `x[n] = n ÷ ${divisor} + ${adder}`;
+        nextNumber = (start + 5 * divisor) / divisor + (isAddition ? adder : -adder);
+        description = `Each number divided by ${divisor} ${isAddition ? 'plus' : 'minus'} ${adder}`;
+        formula = `x[n] = n ÷ ${divisor} ${isAddition ? '+' : '-'} ${adder}`;
         break;
       case 1:
         const ratio = Math.floor(Math.random() * 3) + 2;
@@ -56,17 +55,19 @@ const generateRandomSequences = () => {
         break;
       case 4:
         const addNum = Math.floor(Math.random() * 5) + 1;
-        sequence = Array.from({ length: 5 }, (_, idx) => (idx + 1) * 3 + addNum);
-        nextNumber = 6 * 3 + addNum;  // Calculate next
-        description = `Multiply by 3 and add ${addNum}`;
-        formula = `x[n] = 3n + ${addNum}`;
+        const isAdd = Math.random() < 0.5; // 50% chance for addition vs subtraction
+        sequence = Array.from({ length: 5 }, (_, idx) => (idx + 1) * 3 + (isAdd ? addNum : -addNum));
+        nextNumber = 6 * 3 + (isAdd ? addNum : -addNum);
+        description = `Multiply by 3 ${isAdd ? 'and add' : 'and subtract'} ${addNum}`;
+        formula = `x[n] = 3n ${isAdd ? '+' : '-'} ${addNum}`;
         break;
       case 5:
         const squareAdd = Math.floor(Math.random() * 5) + 1;
-        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 2) + squareAdd);
-        nextNumber = Math.pow(6, 2) + squareAdd;  // Calculate next
-        description = `Square number plus ${squareAdd}`;
-        formula = `x[n] = n² + ${squareAdd}`;
+        const isPlus = Math.random() < 0.5; // 50% chance for addition vs subtraction
+        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 2) + (isPlus ? squareAdd : -squareAdd));
+        nextNumber = Math.pow(6, 2) + (isPlus ? squareAdd : -squareAdd);
+        description = `Square number ${isPlus ? 'plus' : 'minus'} ${squareAdd}`;
+        formula = `x[n] = n² ${isPlus ? '+' : '-'} ${squareAdd}`;
         break;
       default:
         sequence = Array.from({ length: 5 }, (_, idx) => idx + 1);
