@@ -8,7 +8,7 @@ const generateRandomSequences = () => {
 
   while (sequences.length < 10) {
     const type = Math.floor(Math.random() * 6);
-    const start = Math.floor(Math.random() * 100) + 1;
+    let start = Math.floor(Math.random() * 100) + 1;
     let sequence = [];
     let description = '';
     let formula = '';
@@ -18,9 +18,19 @@ const generateRandomSequences = () => {
       case 0:
         const divisor = Math.floor(Math.random() * 3) + 2;
         const adder = Math.floor(Math.random() * 5) + 1;  
-        const isAddition = Math.random() < 0.5; // 50% chance for addition vs subtraction
+        const isAddition = Math.random() < 0.5;
+        const allowNegative = Math.random() < 0.3;
+        
+        // 70% chance to make some numbers cleanly divisible
+        const makeCleanlyDivisible = Math.random() < 0.7;
+        // If making cleanly divisible, ensure the step is a multiple of divisor
+        const step = makeCleanlyDivisible ? divisor * (Math.floor(Math.random() * 2) + 1) : divisor;
+        
+        const minStart = allowNegative ? -50 : (isAddition ? 1 : (adder + 1) * divisor);
+        start = Math.floor(Math.random() * 50) + minStart;
+        
         sequence = Array.from({ length: 5 }, (_, idx) => {
-          const n = start + idx * divisor;
+          const n = start + idx * step;
           const divided = n / divisor;
           const result = isAddition ? divided + adder : divided - adder;
           if (Number.isInteger(result)) {
@@ -28,7 +38,7 @@ const generateRandomSequences = () => {
           }
           return Math.floor(result) === result ? result : `${n}/${divisor} ${isAddition ? '+' : '-'} ${adder}`;
         });
-        nextNumber = (start + 5 * divisor) / divisor + (isAddition ? adder : -adder);
+        nextNumber = (start + 5 * step) / divisor + (isAddition ? adder : -adder);
         description = `Each number divided by ${divisor} ${isAddition ? 'plus' : 'minus'} ${adder}`;
         formula = `x[n] = n ÷ ${divisor} ${isAddition ? '+' : '-'} ${adder}`;
         break;
@@ -55,11 +65,15 @@ const generateRandomSequences = () => {
         break;
       case 4:
         const addNum = Math.floor(Math.random() * 5) + 1;
-        const isAdd = Math.random() < 0.5; // 50% chance for addition vs subtraction
-        sequence = Array.from({ length: 5 }, (_, idx) => (idx + 1) * 3 + (isAdd ? addNum : -addNum));
-        nextNumber = 6 * 3 + (isAdd ? addNum : -addNum);
+        const isAdd = Math.random() < 0.5;
+        // 30% chance to allow negative numbers
+        const allowNegStart = Math.random() < 0.3;
+        const minStartValue = allowNegStart ? -30 : (isAdd ? 1 : addNum + 1);
+        start = Math.floor(Math.random() * 50) + minStartValue;
+        sequence = Array.from({ length: 5 }, (_, idx) => start + (idx * 3) + (isAdd ? addNum : -addNum));
+        nextNumber = start + (5 * 3) + (isAdd ? addNum : -addNum);
         description = `Multiply by 3 ${isAdd ? 'and add' : 'and subtract'} ${addNum}`;
-        formula = `x[n] = 3n ${isAdd ? '+' : '-'} ${addNum}`;
+        formula = `x[n] = ${start} + 3n ${isAdd ? '+' : '-'} ${addNum}`;
         break;
       case 5:
         const squareAdd = Math.floor(Math.random() * 5) + 1;
@@ -68,6 +82,23 @@ const generateRandomSequences = () => {
         nextNumber = Math.pow(6, 2) + (isPlus ? squareAdd : -squareAdd);
         description = `Square number ${isPlus ? 'plus' : 'minus'} ${squareAdd}`;
         formula = `x[n] = n² ${isPlus ? '+' : '-'} ${squareAdd}`;
+        break;
+      case 6:  // Add new case for cubed numbers
+        const cubeConst = Math.floor(Math.random() * 5) + 1;
+        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 3) + cubeConst);
+        nextNumber = Math.pow(6, 3) + cubeConst;  // Calculate next
+        description = `Cube numbers plus ${cubeConst}`;
+        formula = `x[n] = n³ + ${cubeConst}`;
+        break;
+      case 7:  // Add new case for square root sequence
+        const offset = Math.floor(Math.random() * 5);  // Random offset 0-4
+        sequence = Array.from({ length: 5 }, (_, idx) => {
+          const perfectSquare = Math.pow(idx + offset + 1, 2);  // Generate perfect square
+          return Math.sqrt(perfectSquare);
+        });
+        nextNumber = Math.sqrt(Math.pow(5 + offset + 1, 2));  // Calculate next
+        description = `Square root of perfect squares starting from ${Math.pow(offset + 1, 2)}`;
+        formula = `x[n] = √(${offset > 0 ? '(n+' + offset + ')' : 'n'}²)`;
         break;
       default:
         sequence = Array.from({ length: 5 }, (_, idx) => idx + 1);
