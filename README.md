@@ -2,6 +2,35 @@
 
 A React-based mathematical sequence guessing game that challenges players to identify patterns and predict the next number in various sequences.
 
+## Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/helenafsd/sequence-guess.git
+cd sequence-guess
+```
+
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+
+3. Start the development server:
+
+```bash
+npm start
+```
+
+
+4. Open your browser and navigate to `http://localhost:3000`
+
+Note: Make sure you have Node.js and npm installed on your system before running these commands.
+
+
 ## Description
 
 This game presents players with different types of mathematical sequences and asks them to predict the next number in each sequence. It includes various types of sequences:
