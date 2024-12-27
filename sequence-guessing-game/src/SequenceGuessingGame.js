@@ -17,22 +17,17 @@ const generateRandomSequences = () => {
     switch (type) {
       case 0:
         {
-          const divisor = Math.floor(Math.random() * 3) + 2; // Random divisor between 2 and 4
+          const divisor = Math.floor(Math.random() * 3) + 2;
           const start = (Math.floor(Math.random() * 20) + 1) * divisor;
-          const addend = Math.floor(Math.random() * 6);  // Random number 0-5 to add
+          const addend = Math.floor(Math.random() * 6);  
           
           sequence = Array.from({ length: 5 }, (_, idx) => {
             const n = start + idx * divisor;
-            // Check if it divides evenly
-            return n % divisor === 0 ? (n / divisor).toString() : `${n}/${divisor}`;
+            return (n / divisor) + addend; 
           });
-          nextNumber = (start + 5 * divisor + addend) / divisor;
-          description = addend === 0 
-            ? `Each number divided by ${divisor}`
-            : `Each number plus ${addend}, then divided by ${divisor}`;
-          formula = addend === 0 
-            ? `x[n] = n ÷ ${divisor}`
-            : `x[n] = (n + ${addend}) ÷ ${divisor}`;
+          nextNumber = (start + 5 * divisor) / divisor + addend; 
+          description = `Starting at ${start}, each number divided by ${divisor} plus ${addend}`;
+          formula = `x[n] = ((${start} + n×${divisor}) ÷ ${divisor}) + ${addend}`;
         }
         break;
       case 1:
@@ -175,7 +170,7 @@ const SequenceGuessingGame = () => {
     const userGuess = evaluateGuess(userInput);
     const expectedNext = sequences[index].nextNumber;  
   
-    // Add debugging here
+    
     console.log('Checking sequence:', {
       sequence: sequences[index].sequence,
       type: sequences[index].type,
