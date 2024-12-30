@@ -5,99 +5,131 @@ const generateRandomSequences = () => {
   const sequences = [];
   const usedSequences = new Set();
   const sequenceToString = (seq) => seq.join(',');
+  const numCases = 10;
+  const caseTypes = Array.from({ length: numCases }, (_, i) => i);
 
-  while (sequences.length < 10) {
-    const type = Math.floor(Math.random() * 6);
-    let start = Math.floor(Math.random() * 100) + 1;
+  // Shuffle the case types
+  for (let i = caseTypes.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [caseTypes[i], caseTypes[j]] = [caseTypes[j], caseTypes[i]];
+  }
+
+  for (const type of caseTypes) {
+    
     let sequence = [];
     let description = '';
     let formula = '';
     let nextNumber = 0; 
+    
 
     switch (type) {
       case 0:
         {
-          const divisor = Math.floor(Math.random() * 3) + 2;
-          const start = (Math.floor(Math.random() * 20) + 1) * divisor;
-          const addend = Math.floor(Math.random() * 6);  
-          
+          let divisor = Math.floor(Math.random() * 3) + 2;
+          let addend = Math.floor(Math.random() * 6);
+          let start = (Math.floor(Math.random() * 20) + 1) * divisor;
+      
           sequence = Array.from({ length: 5 }, (_, idx) => {
             const n = start + idx * divisor;
-            return (n / divisor) + addend; 
+            return (n / divisor) + addend;
           });
-          nextNumber = (start + 5 * divisor) / divisor + addend; 
+          nextNumber = (start + 5 * divisor) / divisor + addend;
           description = `Starting at ${start}, each number divided by ${divisor} plus ${addend}`;
           formula = `x[n] = ((${start} + n×${divisor}) ÷ ${divisor}) + ${addend}`;
         }
         break;
       case 1:
+        {
+        const start = Math.floor(Math.random() * 201) - 100;
         const ratio = Math.floor(Math.random() * 3) + 2;
         sequence = Array.from({ length: 5 }, (_, idx) => start * Math.pow(ratio, idx));
         nextNumber = sequence[sequence.length - 1] * ratio;  // Calculate next
         description = `Geometric sequence with ratio of ${ratio}`;
         formula = `x[n] = x[n-1] × ${ratio}`;
+        }
         break;
       case 2:
-        const squareConst = Math.floor(Math.random() * 5) + 1;
-        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 2) + squareConst);
-        nextNumber = Math.pow(6, 2) + squareConst;  // Calculate next
-        description = `Square numbers plus ${squareConst}`;
-        formula = `x[n] = n² + ${squareConst}`;
+        {
+          const start = Math.floor(Math.random() * 201) - 100;
+          const squareConst = Math.floor(Math.random() * 5) + 1;
+          sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 2) + squareConst);
+          nextNumber = Math.pow(6, 2) + squareConst;  // Calculate next
+          description = `Square numbers plus ${squareConst}`;
+          formula = `x[n] = n² + ${squareConst}`;
+        }
         break;
       case 3:
-        const factorial = (n) => (n === 0 || n === 1 ? 1 : n * factorial(n - 1));
-        const isAddFactorial = Math.random() < 0.5; // 50% chance for addition vs subtraction
-        const factorialOffset = Math.floor(Math.random() * 5) + 1;
-        
-        sequence = Array.from({ length: 5 }, (_, idx) => {
-          const fact = factorial(idx + 1);
-          return isAddFactorial ? fact + factorialOffset : fact - factorialOffset;
-        });
-        nextNumber = isAddFactorial ? factorial(6) + factorialOffset : factorial(6) - factorialOffset;
-        description = `Factorial sequence ${isAddFactorial ? 'plus' : 'minus'} ${factorialOffset}`;
-        formula = `x[n] = n! ${isAddFactorial ? '+' : '-'} ${factorialOffset}`;
+        {
+          const start = Math.floor(Math.random() * 201) - 100;
+          const factorial = (n) => (n === 0 || n === 1 ? 1 : n * factorial(n - 1));
+          const isAddFactorial = Math.random() < 0.5; // 50% chance for addition vs subtraction
+          const factorialOffset = Math.floor(Math.random() * 5) + 1;
+          
+          sequence = Array.from({ length: 5 }, (_, idx) => {
+            const fact = factorial(idx + 1);
+            return isAddFactorial ? fact + factorialOffset : fact - factorialOffset;
+          });
+          nextNumber = isAddFactorial ? factorial(6) + factorialOffset : factorial(6) - factorialOffset;
+          description = `Factorial sequence ${isAddFactorial ? 'plus' : 'minus'} ${factorialOffset}`;
+          formula = `x[n] = n! ${isAddFactorial ? '+' : '-'} ${factorialOffset}`;
+        }
+        break;
       case 4:
-        const addNum = Math.floor(Math.random() * 5) + 1;
-        const isAdd = Math.random() < 0.5;
-        // 30% chance to allow negative numbers
-        const allowNegStart = Math.random() < 0.3;
-        const minStartValue = allowNegStart ? -30 : (isAdd ? 1 : addNum + 1);
-        start = Math.floor(Math.random() * 50) + minStartValue;
-        sequence = Array.from({ length: 5 }, (_, idx) => start + (idx * 3) + (isAdd ? addNum : -addNum));
-        nextNumber = start + (5 * 3) + (isAdd ? addNum : -addNum);
-        description = `Multiply by 3 ${isAdd ? 'and add' : 'and subtract'} ${addNum}`;
-        formula = `x[n] = ${start} + 3n ${isAdd ? '+' : '-'} ${addNum}`;
+        {
+          const start = Math.floor(Math.random() * 201) - 100;
+          const addNum = Math.floor(Math.random() * 5) + 1;
+          const isAdd = Math.random() < 0.5;
+          // 30% chance to allow negative numbers
+          const allowNegStart = Math.random() < 0.3;
+          const minStartValue = allowNegStart ? -30 : (isAdd ? 1 : addNum + 1);
+          start = Math.floor(Math.random() * 50) + minStartValue;
+          sequence = Array.from({ length: 5 }, (_, idx) => start + (idx * 3) + (isAdd ? addNum : -addNum));
+          nextNumber = start + (5 * 3) + (isAdd ? addNum : -addNum);
+          description = `Multiply by 3 ${isAdd ? 'and add' : 'and subtract'} ${addNum}`;
+          formula = `x[n] = ${start} + 3n ${isAdd ? '+' : '-'} ${addNum}`;
+        }
         break;
       case 5:
-        const squareAdd = Math.floor(Math.random() * 5) + 1;
-        const isPlus = Math.random() < 0.5; // 50% chance for addition vs subtraction
-        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 2) + (isPlus ? squareAdd : -squareAdd));
-        nextNumber = Math.pow(6, 2) + (isPlus ? squareAdd : -squareAdd);
-        description = `Square number ${isPlus ? 'plus' : 'minus'} ${squareAdd}`;
-        formula = `x[n] = n² ${isPlus ? '+' : '-'} ${squareAdd}`;
+        {
+          const squareAdd = Math.floor(Math.random() * 5) + 1;
+          const isPlus = Math.random() < 0.5; 
+          const start = Math.floor(Math.random() * 201) - 100; 
+
+          const sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(start + idx + 1, 2) + (isPlus ? squareAdd : -squareAdd));
+          const nextNumber = Math.pow(start + 6, 2) + (isPlus ? squareAdd : -squareAdd);
+    
+          const description = `Square number ${isPlus ? 'plus' : 'minus'} ${squareAdd}`;
+          const formula = `x[n] = (${start} + n)² ${isPlus ? '+' : '-'} ${squareAdd}`;
+        }
         break;
       case 6:  
-        const cubeConst = Math.floor(Math.random() * 5) + 1;
-        sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 3) + cubeConst);
-        nextNumber = Math.pow(6, 3) + cubeConst;  // Calculate next
-        description = `Cube numbers plus ${cubeConst}`;
-        formula = `x[n] = n³ + ${cubeConst}`;
+        {
+          let start = Math.floor(Math.random() * 201) - 100;
+          let cubeConst = Math.floor(Math.random() * 5) + 1;
+          let sequence = Array.from({ length: 5 }, (_, idx) => Math.pow(idx + 1, 3) + cubeConst);
+          let nextNumber = Math.pow(6, 3) + cubeConst;  // Calculate next
+          let description = `Cube numbers plus ${cubeConst}`;
+          let formula = `x[n] = n³ + ${cubeConst}`;
+        }
         break;
       case 7:  // Add new case for square root sequence
-        const offset = Math.floor(Math.random() * 5);  // Random offset 0-4
-        sequence = Array.from({ length: 5 }, (_, idx) => {
-          const perfectSquare = Math.pow(idx + offset + 1, 2);  // Generate perfect square
-          return Math.sqrt(perfectSquare);
-        });
-        nextNumber = Math.sqrt(Math.pow(5 + offset + 1, 2));  // Calculate next
-        description = `Square root of perfect squares starting from ${Math.pow(offset + 1, 2)}`;
-        formula = `x[n] = √(${offset > 0 ? '(n+' + offset + ')' : 'n'}²)`;
+        {
+          const offset = Math.floor(Math.random() * 5); // Random offset 0-4
+          sequence = Array.from({ length: 5 }, (_, idx) => {
+            const perfectSquare = Math.pow(idx + offset + 1, 2); // Generate perfect square
+            return Math.sqrt(perfectSquare);
+          });
+          nextNumber = Math.sqrt(Math.pow(5 + offset + 1, 2)); // Calculate next
+          description = `Square root of perfect squares starting from ${Math.pow(offset + 1, 2)}`;
+          formula = `x[n] = √(${offset > 0 ? '(n+' + offset + ')' : 'n'}²)`;
+        }
         break;
       case 8: 
+        {
         // Generate random start between -1000 and 1000
-        const fibStart = Math.floor(Math.random() * 2001) - 1000;
-        
+        const fibStart = Math.floor(Math.random() * 2001) - 1000;        
         const fibSecond = fibStart + (Math.floor(Math.random() * 21) - 10);
+
         
         sequence = [fibStart, fibSecond];
         // Generate next 3 numbers in Fibonacci-style (each number is sum of previous two)
@@ -107,8 +139,20 @@ const generateRandomSequences = () => {
         nextNumber = sequence[sequence.length - 1] + sequence[sequence.length - 2];
         description = `Fibonacci-style sequence starting at ${fibStart}`;
         formula = `x[n] = x[n-1] + x[n-2]`;
+        }
         break;
-
+      case 9: // New case for a + [(n + 2) * 3]
+        {
+          const startingNumber = Math.floor(Math.random() * 201) - 100; // Random number between -100 and 100
+        sequence = [startingNumber];
+        for (let i = 1; i < 5; i++) {
+          sequence.push(sequence[i - 1] + ((i + 2) * 3));
+        }
+        nextNumber = sequence[sequence.length - 1] + ((sequence.length + 2) * 3);
+        description = 'Sequence with a starting number and adding (n + 2) * 3 to the previous number';
+        formula = `x[n] = x[n-1] + (n + 2) * 3`;
+        }
+        break;
       default:
         sequence = Array.from({ length: 5 }, (_, idx) => idx + 1);
         nextNumber = 6;
