@@ -1,6 +1,6 @@
 # Sequence Guessing Game
 
-A React-based mathematical sequence guessing game that challenges players to identify patterns and predict the next number in various sequences.
+A mathematical sequence guessing game that challenges players to identify patterns and predict the next number in various sequences. The game can be run either as a React web application or Python streamlit.
 
 ## Installation
 
@@ -12,23 +12,35 @@ cd sequence-guess
 ```
 
 
-2. Install dependencies:
+2. (React) Install dependencies:
 
 ```bash
 npm install
 ```
 
+2. (Python) Install dependencies:
 
-3. Start the development server:
+```bash
+pip install streamlit
+```
+
+3. (React) Start the development server:
 
 ```bash
 npm start
 ```
 
+3. (Python) Run the streamlit app:
 
-4. Open your browser and navigate to `http://localhost:3000`
+```bash
+streamlit run SequenceGuessingGame.py
+```
 
-Note: Make sure you have Node.js and npm installed on your system before running these commands.
+
+4. (React) Open your browser and navigate to `http://localhost:3000`
+
+5. (Python) Open your browser and navigate to `http://localhost:8501`
+
 
 
 ## Description
@@ -59,20 +71,6 @@ This game presents players with different types of mathematical sequences and as
 5. If incorrect, a hint about the sequence type will be shown
 6. Refresh the page to get new sequences
 
-## Installation
-
-1. Clone the repository
-2. Run `npm install` to install dependencies
-3. Run `npm start` to start the development server
-4. Open `http://localhost:3000` in your browser
-
-
-
-## Technologies Used
-
-- React
-- JavaScript
-- CSS-in-JS styling
 
 ## Contributing
 
@@ -81,15 +79,6 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
-## Future Improvements
-
-- Add more sequence types
-- Add difficulty levels
-- Add a scoring system
-- Add a timer mode
-- Add multiplayer support
-- Add statistics tracking
 
 ## Screenshots
 

@@ -170,10 +170,10 @@ def main():
                         st.session_state.formula_shown[idx] = True
                     else:
                         st.error(f"Try again! Hint: This is a {seq_data['description']}")
-                        if not st.session_state.formula_shown[idx]:
-                            if st.button("Show Formula", key=f"show_formula_{idx}"):
-                                st.write(f"Formula: {seq_data['formula']}", key=f"formula_{idx}")
-                                st.session_state.formula_shown[idx] = True
+                        # if not st.session_state.formula_shown[idx]:
+                        #     if st.button("Show Formula", key=f"show_formula_{idx}"):
+                        #         st.write(f"Formula: {seq_data['formula']}", key=f"formula_{idx}")
+                        #         st.session_state.formula_shown[idx] = True
 
 
 
