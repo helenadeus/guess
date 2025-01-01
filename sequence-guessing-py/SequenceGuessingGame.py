@@ -86,13 +86,17 @@ def generate_square_root_sequence():
     return sequence, next_number, description, formula
 
 def generate_fibonacci_sequence():
-    fib_start = random.randint(-1000, 1000)
-    fib_second = fib_start + random.randint(-10, 10)
-    sequence = [fib_start, fib_second]
-    for _ in range(3):
-        sequence.append(sequence[-1] + sequence[-2])
-    next_number = sequence[-1] + sequence[-2]
-    description = f"Fibonacci-style sequence starting at {fib_start}"
+    fib_sequence = [1, 1]
+    for _ in range(998):
+        fib_sequence.append(fib_sequence[-1] + fib_sequence[-2])
+
+    # Pick a random starting index between 0 and 1000
+    start_index = random.randint(0, 1000)
+
+    # Get the sequence of 5 consecutive Fibonacci numbers starting from the random index
+    sequence = fib_sequence[start_index:start_index+5]
+    next_number = fib_sequence[start_index+5]
+    description = f"Fibonacci sequence starting from the {start_index}th number"
     formula = "x[n] = x[n-1] + x[n-2]"
 
     return sequence, next_number, description, formula
@@ -160,6 +164,7 @@ def main():
         with st.expander(f"Sequence {idx + 1}"):
             st.write(", ".join(map(str, seq_data['sequence'])))
             user_guess = st.number_input(f"Your guess for the next number", key=f"guess_{idx}", step=1.0, value=st.session_state.user_guesses[idx])
+            attempt_count = sum(1 for prev_guess in st.session_state.user_guesses[:idx+1] if prev_guess is not None)
             if st.button(f"Check Sequence {idx + 1}", key=f"check_{idx}"):
                 if user_guess is None:
                     st.warning("Please enter a value to check the sequence.")
@@ -169,11 +174,11 @@ def main():
                         st.success(f"Correct! Formula: {seq_data['formula']}")
                         st.session_state.formula_shown[idx] = True
                     else:
-                        st.error(f"Try again! Hint: This is a {seq_data['description']}")
-                        # if not st.session_state.formula_shown[idx]:
-                        #     if st.button("Show Formula", key=f"show_formula_{idx}"):
-                        #         st.write(f"Formula: {seq_data['formula']}", key=f"formula_{idx}")
-                        #         st.session_state.formula_shown[idx] = True
+                        if attempt_count < 2:
+                            st.error(f"Try again! Hint: This is a {seq_data['description']}")
+                        else:
+                            st.error(f"Try again! Formula: {seq_data['formula']}")
+                            st.session_state.formula_shown[idx] = True
 
 
 
