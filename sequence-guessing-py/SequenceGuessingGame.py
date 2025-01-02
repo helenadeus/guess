@@ -87,11 +87,11 @@ def generate_square_root_sequence():
 
 def generate_fibonacci_sequence():
     fib_sequence = [1, 1]
-    for _ in range(998):
+    for _ in range(21):
         fib_sequence.append(fib_sequence[-1] + fib_sequence[-2])
 
     # Pick a random starting index between 0 and 1000
-    start_index = random.randint(0, 1000)
+    start_index = random.randint(0, 23)
 
     # Get the sequence of 5 consecutive Fibonacci numbers starting from the random index
     sequence = fib_sequence[start_index:start_index+5]
@@ -160,27 +160,30 @@ def main():
 
     sequences = st.session_state.sequences
 
+
     for idx, seq_data in enumerate(sequences):
         with st.expander(f"Sequence {idx + 1}"):
             st.write(", ".join(map(str, seq_data['sequence'])))
-            user_guess = st.number_input(f"Your guess for the next number", key=f"guess_{idx}", step=1.0, value=st.session_state.user_guesses[idx])
+            user_guess = st.text_input(f"Your guess for the next number", key=f"guess_{idx}", value=str(st.session_state.user_guesses[idx]) if st.session_state.user_guesses[idx] is not None else "")
             attempt_count = sum(1 for prev_guess in st.session_state.user_guesses[:idx+1] if prev_guess is not None)
             if st.button(f"Check Sequence {idx + 1}", key=f"check_{idx}"):
-                if user_guess is None:
+                if not user_guess:
                     st.warning("Please enter a value to check the sequence.")
                 else:
-                    st.session_state.user_guesses[idx] = user_guess
-                    if abs(user_guess - seq_data['next_number']) < 0.1:
-                        st.success(f"Correct! Formula: {seq_data['formula']}")
-                        st.session_state.formula_shown[idx] = True
-                    else:
-                        if attempt_count < 2:
-                            st.error(f"Try again! Hint: This is a {seq_data['description']}")
-                        else:
-                            st.error(f"Try again! Formula: {seq_data['formula']}")
+                    try:
+                        user_guess = float(user_guess)
+                        st.session_state.user_guesses[idx] = user_guess
+                        if abs(user_guess - seq_data['next_number']) < 0.1:
+                            st.success(f"Correct! Formula: {seq_data['formula']}")
                             st.session_state.formula_shown[idx] = True
-
-
+                        else:
+                            if attempt_count < 2:
+                                st.error(f"Try again! Hint: This is a {seq_data['description']}")
+                            else:
+                                st.error(f"Try again! Formula: {seq_data['formula']}")
+                                st.session_state.formula_shown[idx] = True
+                    except ValueError:
+                        st.warning("Please enter a valid number.")
 
 
 if __name__ == "__main__":
