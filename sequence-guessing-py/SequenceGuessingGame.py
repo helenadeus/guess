@@ -91,7 +91,7 @@ def generate_fibonacci_sequence():
         fib_sequence.append(fib_sequence[-1] + fib_sequence[-2])
 
     # Pick a random starting index between 0 and 1000
-    start_index = random.randint(0, 23)
+    start_index = random.randint(0, 19) 
 
     # Get the sequence of 5 consecutive Fibonacci numbers starting from the random index
     sequence = fib_sequence[start_index:start_index+5]
