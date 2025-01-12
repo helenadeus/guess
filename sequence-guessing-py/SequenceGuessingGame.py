@@ -136,6 +136,12 @@ def generate_random_sequences():
     for case_type in case_types:
         sequence, next_number, description, formula = sequence_generators[case_type]()
         sequence_string = sequence_to_string(sequence)
+
+        # {{ Check if the sequence is a straight sequence }}
+        if len(set(sequence)) == len(sequence) and sequence == list(range(min(sequence), max(sequence)+1)):
+            continue  # Skip this sequence and generate a new one
+        # {{ /Check if the sequence is a straight sequence }}
+        
         if sequence_string not in used_sequences:
             used_sequences.add(sequence_string)
             sequences.append({
