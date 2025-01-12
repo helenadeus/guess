@@ -7,27 +7,14 @@ A mathematical sequence guessing game that challenges players to identify patter
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/helenafsd/sequence-guess.git
-cd sequence-guess
-```
-
-
-2. (React) Install dependencies:
-
-```bash
-npm install
+git clone https://github.com/helenadeus/guess.git
+cd guess/sequence-guessing-py
 ```
 
 2. (Python) Install dependencies:
 
 ```bash
-pip install streamlit
-```
-
-3. (React) Start the development server:
-
-```bash
-npm start
+pip install -r requirements.txt
 ```
 
 3. (Python) Run the streamlit app:
@@ -36,10 +23,7 @@ npm start
 streamlit run SequenceGuessingGame.py
 ```
 
-
-4. (React) Open your browser and navigate to `http://localhost:3000`
-
-5. (Python) Open your browser and navigate to `http://localhost:8501`
+4. (Python) Open your browser and navigate to `http://localhost:8501`
 
 
 
