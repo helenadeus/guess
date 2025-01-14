@@ -90,8 +90,8 @@ def generate_fibonacci_sequence():
     for _ in range(21):
         fib_sequence.append(fib_sequence[-1] + fib_sequence[-2])
 
-    # Pick a random starting index between 0 and 1000
-    start_index = random.randint(0, 19) 
+    # Pick a random starting index between 0 and 16 (inclusive)
+    start_index = random.randint(0, 16)
 
     # Get the sequence of 5 consecutive Fibonacci numbers starting from the random index
     sequence = fib_sequence[start_index:start_index+5]
@@ -130,27 +130,34 @@ def generate_random_sequences():
     used_sequences = set()
     sequence_to_string = lambda seq: ','.join(map(str, seq))
 
-    case_types = list(range(10))
-    random.shuffle(case_types)
+    sequences = []
+    used_sequences = set()
+    sequence_to_string = lambda seq: ','.join(map(str, seq))
 
-    for case_type in case_types:
-        sequence, next_number, description, formula = sequence_generators[case_type]()
-        sequence_string = sequence_to_string(sequence)
+    while len(sequences) < 10:
+        case_types = list(range(10))
+        random.shuffle(case_types)
 
-        # {{ Check if the sequence is a straight sequence }}
-        if len(set(sequence)) == len(sequence) and sequence == list(range(min(sequence), max(sequence)+1)):
-            continue  # Skip this sequence and generate a new one
-        # {{ /Check if the sequence is a straight sequence }}
-        
-        if sequence_string not in used_sequences:
-            used_sequences.add(sequence_string)
-            sequences.append({
-                'sequence': sequence,
-                'type': case_type,
-                'description': description,
-                'formula': formula,
-                'next_number': next_number
-            })
+        for case_type in case_types:
+            sequence, next_number, description, formula = sequence_generators[case_type]()
+            sequence_string = sequence_to_string(sequence)
+
+            # Skip straight sequences
+            if sequence == list(range(sequence[0], sequence[0] + len(sequence))):
+                continue
+            
+            if sequence_string not in used_sequences:
+                used_sequences.add(sequence_string)
+                sequences.append({
+                    'sequence': sequence,
+                    'type': case_type,
+                    'description': description,
+                    'formula': formula,
+                    'next_number': next_number
+                })
+
+                if len(sequences) == 10:
+                    break
 
     return sequences
 
