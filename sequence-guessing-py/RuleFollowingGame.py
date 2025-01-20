@@ -122,119 +122,91 @@ def generate_4way_relationships(words):
 def main():
     st.title("Animal Order Puzzle")
     
+    #setup
     difficulty2slots = {"Easy":2, "Medium":3, "Hard":4}
     difficulty2fun = {"Easy":generate_2way_relationships
     (words), "Medium":generate_3way_relationships(words), "Hard":generate_4way_relationships(words)}
+
     
+    #if we changed the difficulty, we can refresh, otherwise preserve
     difficulty = st.selectbox("Select difficulty level", ["Easy", "Medium", "Hard"])
-    num_slots = difficulty2slots[difficulty]
+    print("DIFFICULTY",difficulty)
+    
+    if("difficulty" in st.session_state):
+        prev_difficulty = st.session_state.difficulty
+    else:
+        prev_difficulty=difficulty
+
+   
+    if(prev_difficulty!=difficulty):
+        for key in st.session_state.keys():
+            del st.session_state[key]
+    st.session_state.difficulty = difficulty
+            
+    num_slots = difficulty2slots[st.session_state.difficulty]
+    print('number slots start', num_slots)
     
     if("relationships" not in st.session_state):
-        relationships = difficulty2fun[difficulty]
+        
+
+
+        st.session_state.relationships = difficulty2fun[st.session_state.difficulty]
+        relationships = difficulty2fun[st.session_state.difficulty]
         st.session_state.relationships = relationships
     else:
         relationships = st.session_state.relationships
-        
+
     
-    #if we changed the difficulty, we can refresh, otherwise preserve
-    if("difficulty" in st.session_state and difficulty != st.session_state.difficulty):
-        relationships = difficulty2fun[difficulty]
-        num_slots = difficulty2slots[difficulty]
 
     if "user_order" not in st.session_state:
         user_order = {}
         st.session_state.user_order = user_order
     else:
         user_order = st.session_state.user_order 
-    
-    
-    # Assuming you have a relationship with index 0
-    relationship_index = 0
+        
+    for relationship_index, relationship in enumerate(relationships):
+        
 
-    # Check if the user has already interacted with this relationship
-    if relationship_index in st.session_state.user_order:
-        # Recover the user's previous selections
-        user_selections = st.session_state.user_order[relationship_index]
-        print("IN STATE")
-    else:
-        # Initialize an empty dictionary for this relationship
-        user_selections = {}
-        st.session_state.user_order[relationship_index] = user_selections
-        print("NOT IN STATE")
-
-    # Display the relationship hint
-    st.subheader(f"Relationship {relationship_index + 1}")
-    st.write(relationships[relationship_index]['hint'])
-
-    # Create slots for user input
-    slots = st.columns(num_slots)
-
-    # Iterate over the slots
-    for j, slot in enumerate(slots):
-        with slot:
-            # Check if the user has already selected an option for this slot
-            if j in user_selections:
-                # Recover the user's previous selection
-                default_value = user_selections[j]
-            else:
-                default_value = ""
-
-            # Display the dropdown for the user to select an option
-            user_selection = st.selectbox(
-                f"Slot {j + 1}",
-                [""] + words,
-                index=words.index(default_value) if default_value in words else 0,
-                key=f"slot_{relationship_index}_{j}"
-            )
-
-            # Update the user's selection in the session state
-            if user_selections.get(j, "") != user_selection:
-                user_selections[j] = user_selection
-                st.session_state.user_order[relationship_index] = user_selections
-
-
-    # Check if the user clicked the "Check" button
-    if st.button(f"Check {relationship_index + 1}", key=f"check_{relationship_index}"):
-        # Check if the user's selections match the correct order
-        if list(user_selections.values()) == relationships[relationship_index]['order']:
-            st.success("Correct order!")
+        if relationship_index in st.session_state.user_order:
+            # Recover the user's previous selections
+            print("sels IN STATE")
+            user_selections = st.session_state.user_order[relationship_index]
         else:
-            st.error(f"Incorrect order. The correct order is: {', '.join(relationships[relationship_index]['order'])}")
-    
-    # for i, rel in enumerate(relationships[:10]):
-    #     st.subheader(f"Relationship {i+1}")
-    #     st.write(rel['hint'])
-        
-        
-    #     slots = st.columns(num_slots)
-        
-    #     #user gone through this already; 
-    #     if(i not in user_order):
-    #         user_order[i] = {}
-        
-    #     for j, slot in enumerate(slots):
-    #         with slot:
-    #             if(j not in user_order[i]):
-    #                 user_order[i][j] = ""
-    #                 default_value = ""
-    #             else:
-    #                 default_value = user_order[i][j]
-                
-                
-    #             user_selection = st.selectbox(
-    #                 f"Slot {j+1}", 
-    #                 [""] + words, 
-    #                 index=words.index(default_value) if default_value in words else 0, 
-    #                 key=f"slot_{i}_{j}")
-                
-    #             st.session_state.user_order[i][j] = user_selection
-        
-    #     print(st.session_state.user_order)
-    #     if st.button(f"Check {i+1}", key=f"check_{i}"):
-    #         if user_order == rel['order']:
-    #             st.success("Correct order!")
-    #         else:
-    #             st.error(f"Incorrect order. The correct order is: {', '.join(rel['order'])}")
+            print("sels NOT IN STATE")
+            # Initialize an empty dictionary for this relationship with as many keys as slots
+            user_selections = {i: "" for i in range(num_slots)}
+            print(num_slots, user_selections)
+            st.session_state.user_order[relationship_index] = user_selections
 
+        # Display the relationship hint
+        st.subheader(f"Relationship {relationship_index + 1}")
+        st.write(relationships[relationship_index]['hint'])
+
+        # Create slots for user input
+        slots = st.columns(num_slots)
+        for j, slot in enumerate(slots):
+            with slot:
+                default_value = st.session_state.user_order[relationship_index][j]
+                print(relationship_index, j, default_value, )
+                st.session_state.user_order[relationship_index][j] = st.selectbox(
+                        f"Slot {j + 1}",
+                        [""] + words,
+                        index=0 if default_value == "" else words.index(default_value) + 1,
+                        key=f"slot_{relationship_index}_{j}"
+                    )
+            # Check if the user clicked the "Check" button
+        if st.button(f"Check {relationship_index + 1}", key=f"check_{relationship_index}"):
+            user_selections = st.session_state.user_order[relationship_index]
+            # Check if the user's selections match the correct order
+            if list(user_selections.values()) == relationships[relationship_index]['order']:
+                st.success("Correct order!")
+                
+
+                
+            else:
+                st.error(f"Incorrect order. The correct order is: {', '.join(relationships[relationship_index]['order'])}")
+
+
+    
 if __name__ == "__main__":
     main()
