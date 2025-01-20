@@ -70,7 +70,7 @@ def generate_2way_relationships(words):
 
     return relationships
 
-def generate_3way_relationships(words):
+def generate_3way_relationships_old(words):
     """
     Generate random three-way relationships between animals.
     """
@@ -89,6 +89,41 @@ def generate_3way_relationships(words):
         relationships.append({'order': order, 'hint': hint})
 
     return relationships
+
+import random
+
+import random
+
+def generate_3way_relationships(words):
+    """
+    Generate random three-way relationships between words with more complex hints.
+    """
+    relationships = []
+    for i in range(len(words) - 2):
+        word1 = words[i]
+        word2, word3 = random.sample([w for w in words if w != word1], 2)
+        order = [word1, word2, word3]
+        random.shuffle(order)
+
+        # Generate complex hints that always reference all three words
+        if order == [word2, word1, word3]:
+            hint = (
+                f"{word1.capitalize()} is somewhere between {word2.capitalize()} and {word3.capitalize()}. "
+                f"The first word alphabetically is not last, and the last word alphabetically is not first. "
+                f"{word2.capitalize()} comes before {word3.capitalize()}."
+            )
+        else:
+            hint = (
+                f"{order[0].capitalize()} comes earlier than {order[1].capitalize()} and {order[2].capitalize()}. "
+                f"The word in the middle alphabetically is not the last in the sequence. "
+                f"{order[1].capitalize()} is between {order[0].capitalize()} and {order[2].capitalize()}."
+            )
+
+        relationships.append({'order': order, 'hint': hint})
+
+    return relationships
+
+
 
 def generate_4way_relationships(words):
     """
@@ -129,7 +164,7 @@ def main():
 
     
     #if we changed the difficulty, we can refresh, otherwise preserve
-    difficulty = st.selectbox("Select difficulty level", ["Easy", "Medium", "Hard"])
+    difficulty = st.selectbox("Select difficulty level", ["Easy", "Medium", "Hard"], index=1)
     print("DIFFICULTY",difficulty)
     
     if("difficulty" in st.session_state):
