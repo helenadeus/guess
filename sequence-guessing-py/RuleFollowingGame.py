@@ -2,7 +2,8 @@ import random
 import streamlit as st
 
 # Define the words
-words = ['lion', 'tiger', 'bear', 'elephant', 'giraffe', 'zebra', 'hippo']
+words = ['lion', 'tiger', 'bear', 'elephant', 'giraffe', 'zebra', 'hippo', 'ant']
+
 
 def handle_relationship(relationship_index, relationships, words, num_slots):
     # Check if the user has already interacted with this relationship
@@ -70,53 +71,46 @@ def generate_2way_relationships(words):
 
     return relationships
 
-def generate_3way_relationships_old(words):
-    """
-    Generate random three-way relationships between animals.
-    """
-    relationships = []
-    for i in range(len(words) - 2):
-        word1 = words[i]
-        word2, word3 = random.sample([w for w in words if w != word1], 2)
-        order = [word1, word2, word3]
-        random.shuffle(order)
-
-        if order == [word2, word1, word3]:
-            hint = f"{word1.capitalize()} must be between {word2.capitalize()} and {word3.capitalize()}; {word2.capitalize()} must be before {word3.capitalize()}."
-        else:
-            hint = f"{order[0].capitalize()} must come before {order[1].capitalize()} and {order[2].capitalize()}; {order[1].capitalize()} must be between {order[0].capitalize()} and {order[2].capitalize()}."
-
-        relationships.append({'order': order, 'hint': hint})
-
-    return relationships
-
-import random
-
-import random
-
 def generate_3way_relationships(words):
     """
     Generate random three-way relationships between words with more complex hints.
     """
+        
+    word_descriptions = {
+            'lion': ['the king of the beasts', 'the mighty hunter', 'the striped feline', 'the majestic big cat'],
+            'tiger': ['the striped hunter', 'the fierce predator', 'the orange and black feline', 'the jungle stalker'],
+            'bear': ['the furry forest dweller', 'the powerful omnivore', 'the honey-loving creature', 'the clawed climber'],
+            'elephant': ['the largest land mammal', 'the long-trunked gentle giant', 'the massive herbivore', 'the gray giant'],
+            'giraffe': ['the long-necked grazer', 'the tallest animal', 'the spotted equine', 'the patterned horse-like creature'],
+            'zebra': ['the striped equine', 'the black and white horse', 'the herd dweller', 'the African equid'],
+            'hippo': ['the massive river-dweller', 'the territorial herbivore', 'the amphibious giant', 'the barrel-shaped beast'],
+            'ant': ['the tiny worker', 'the industrious insect', 'the colony builder', 'the six-legged forager']
+        }
+    
     relationships = []
     for i in range(len(words) - 2):
-        word1 = words[i]
-        word2, word3 = random.sample([w for w in words if w != word1], 2)
+        word1, word2, word3 = random.sample(words, 3)
         order = [word1, word2, word3]
         random.shuffle(order)
+
+        descriptions = {
+            word1: random.choice(word_descriptions.get(word1, [f"the word '{word1}'"])),
+            word2: random.choice(word_descriptions.get(word2, [f"the word '{word2}'"])),
+            word3: random.choice(word_descriptions.get(word3, [f"the word '{word3}'"])),
+        }
 
         # Generate complex hints that always reference all three words
         if order == [word2, word1, word3]:
             hint = (
-                f"{word1.capitalize()} is somewhere between {word2.capitalize()} and {word3.capitalize()}. "
+                f"{descriptions[word1]} is somewhere between {descriptions[word2]} and {descriptions[word3]}. "
                 f"The first word alphabetically is not last, and the last word alphabetically is not first. "
-                f"{word2.capitalize()} comes before {word3.capitalize()}."
+                f"{descriptions[word2]} comes before {descriptions[word3]}."
             )
         else:
             hint = (
-                f"{order[0].capitalize()} comes earlier than {order[1].capitalize()} and {order[2].capitalize()}. "
+                f"{descriptions[order[0]]} comes earlier than {descriptions[order[1]]} and {descriptions[order[2]]}. "
                 f"The word in the middle alphabetically is not the last in the sequence. "
-                f"{order[1].capitalize()} is between {order[0].capitalize()} and {order[2].capitalize()}."
+                f"{descriptions[order[1]]} is between {descriptions[order[0]]} and {descriptions[order[2]]}."
             )
 
         relationships.append({'order': order, 'hint': hint})
