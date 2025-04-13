@@ -111,6 +111,16 @@ def generate_starting_number_sequence():
     formula = "x[n] = x[n-1] + (n + 2) * 3"
 
     return sequence, next_number, description, formula
+def generate_multiply_sequence():
+    start = random.randint(1, 15)
+    sequence = [start]
+    for idx in range(1, 5):
+        sequence.append(sequence[-1] + idx * 2)
+    next_number = sequence[-1] + 5 * 2
+    description = "Sequence starting with a random number and multiplying by 2, 4, 6, ..."
+    formula = "x[n] = x[0] + (n-1) * 2"
+
+    return sequence, next_number, description, formula
 
 def generate_random_sequences():
     sequence_generators = [
@@ -123,7 +133,8 @@ def generate_random_sequences():
         generate_cube_sequence,
         generate_square_root_sequence,
         generate_fibonacci_sequence,
-        generate_starting_number_sequence
+        generate_starting_number_sequence,
+        generate_multiply_sequence
     ]
 
     sequences = []
@@ -166,17 +177,24 @@ def main():
     st.title("Sequence Guessing Game")
     st.write("Below are 10 sequences. Can you guess the next number?")
 
+    # Initialize session state variables if they don't exist
     if "sequences" not in st.session_state:
         st.session_state.sequences = generate_random_sequences()
         st.session_state.user_guesses = [None] * len(st.session_state.sequences)
         st.session_state.formula_shown = [False] * len(st.session_state.sequences)
+        st.session_state.correct_guesses = [False] * len(st.session_state.sequences)
 
     sequences = st.session_state.sequences
 
-
     for idx, seq_data in enumerate(sequences):
         with st.expander(f"Sequence {idx + 1}"):
-            st.write(", ".join(map(str, seq_data['sequence'])))
+            # Highlight the sequence in green if the user guessed correctly
+            if st.session_state.correct_guesses[idx]:
+                styled_sequence = ", ".join([f"<span style='color: green;'>{num}</span>" for num in seq_data['sequence']])
+                st.markdown(styled_sequence, unsafe_allow_html=True)
+            else:
+                st.write(", ".join(map(str, seq_data['sequence'])))
+
             user_guess = st.text_input(f"Your guess for the next number", key=f"guess_{idx}", value=str(st.session_state.user_guesses[idx]) if st.session_state.user_guesses[idx] is not None else "")
             attempt_count = sum(1 for prev_guess in st.session_state.user_guesses[:idx+1] if prev_guess is not None)
             if st.button(f"Check Sequence {idx + 1}", key=f"check_{idx}"):
@@ -189,6 +207,7 @@ def main():
                         if abs(user_guess - seq_data['next_number']) < 0.1:
                             st.success(f"Correct! Formula: {seq_data['formula']}")
                             st.session_state.formula_shown[idx] = True
+                            st.session_state.correct_guesses[idx] = True  # Mark as correct
                         else:
                             if attempt_count < 2:
                                 st.error(f"Try again! Hint: This is a {seq_data['description']}")
@@ -201,3 +220,16 @@ def main():
 
 if __name__ == "__main__":
     main()
+    import math
+
+    print("n! for values 1 through 6:")
+    for n in range(1, 7):
+        print(f"{n}! = {math.factorial(n)}")
+
+    print("\nn^2 for values 1 through 6:")
+    for n in range(1, 7):
+        print(f"{n}^2 = {n**2}")
+
+    print("\nn^3 for values 1 through 6:")
+    for n in range(1, 7):
+        print(f"{n}^3 = {n**3}")
